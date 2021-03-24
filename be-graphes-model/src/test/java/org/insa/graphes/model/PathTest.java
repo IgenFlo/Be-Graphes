@@ -111,12 +111,13 @@ public class PathTest {
 
     @Test
     public void testIsValid() {
-        assertTrue(emptyPath.isValid());
-        assertTrue(singleNodePath.isValid());
-        assertTrue(shortPath.isValid());
-        assertTrue(longPath.isValid());
-        assertTrue(loopPath.isValid());
-        assertTrue(longLoopPath.isValid());
+    	
+    	assertTrue(emptyPath.isValid());
+    	assertTrue(singleNodePath.isValid());
+    	assertTrue(shortPath.isValid());
+    	assertTrue(longPath.isValid());
+    	assertTrue(loopPath.isValid());
+    	assertTrue(longLoopPath.isValid());
 
         assertFalse(invalidPath.isValid());
     }

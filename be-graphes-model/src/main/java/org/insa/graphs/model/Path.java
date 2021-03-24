@@ -51,7 +51,6 @@ public class Path {
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
      * 
-     * @deprecated Need to be implemented.
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
@@ -207,11 +206,24 @@ public class Path {
     		valid = true;
     	}
     	//test si a un seul noeud sans arcs
-    	if (this.size() == 1 && this.origin.hasSuccessors() == false) {
+    	if (this.size() == 1) {
     		valid = true;
     	}
     	//test 3eme condition
-    	if (this.arcs.get(0).getOrigin() == this.origin) {
+    	if(this.size() > 1){
+	    	if (this.arcs.get(0).getOrigin() == this.getOrigin() ) {
+	    		valid = true;
+	    		for (int i = 0 ; i < this.arcs.size()-1 ; i++) {
+	    			Arc a1 = this.arcs.get(i);
+	    			Arc a2 = this.arcs.get(i+1);
+	    			if (a1.getDestination() == a2.getOrigin()) {
+	    				continue;
+	    			}else{
+	    				valid=false;
+	    				break;
+	    			}
+	    		}
+	    	}
     	}
         return valid;
     }
