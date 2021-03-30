@@ -30,12 +30,34 @@ public class Path {
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
      * 
-     * @deprecated Need to be implemented.
      */
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
         // TODO:
+        if (nodes.size()==1) {
+        	return new Path(graph, nodes.get(0));
+        } 
+        if (nodes.size()==0) {
+        	return new Path(graph);
+        } else {
+        	for (int i=0 ; i<(nodes.size()-1) ; i++) {
+        		Arc arc_min=null;
+        		double min_time = Double.MAX_VALUE;
+        		for(Arc a : nodes.get(i).getSuccessors()) {
+        			if (a.getDestination().equals(nodes.get(i+1))) {
+	        			if(min_time > a.getMinimumTravelTime()) {
+	        				arc_min = a;
+	        				min_time = arc_min.getMinimumTravelTime();
+	        			}
+        			}
+        		}
+            	if(arc_min==null) {
+            		throw new IllegalArgumentException();
+            	}
+            	arcs.add(arc_min);
+        	}
+        }
         return new Path(graph, arcs);
     }
 
@@ -56,6 +78,31 @@ public class Path {
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
         // TODO:
+        if (nodes.size()==1) {
+        	return new Path(graph, nodes.get(0));
+        } else if (nodes.size()==0) {
+        	return new Path(graph);
+        } else {
+        	for (int i=0 ; i<(nodes.size()-1) ; i++) {
+        		Arc arc_min = null;
+        		float min_length = Float.MAX_VALUE;
+        		for (Arc a : nodes.get(i).getSuccessors()) {
+        			if (a.getDestination().equals(nodes.get(i+1))) {
+        				if (min_length>a.getLength()) {
+        					arc_min = a;
+        					min_length = arc_min.getLength();
+        				}
+        			}
+        		}
+        		if(arc_min == null) {
+        			throw new IllegalArgumentException();
+        		}
+        		arcs.add(arc_min);
+        	}
+        }
+        
+        
+        
         return new Path(graph, arcs);
     }
 
