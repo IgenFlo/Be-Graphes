@@ -39,6 +39,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         labels.get(data.getOrigin().getId()).setCost(0);
         labels.get(data.getOrigin().getId()).setMarque(true);
         tas.insert(labels.get(data.getOrigin().getId()));
+        notifyOriginProcessed(data.getOrigin());
         
         //DEROULEMENT
         int compteur = 1;
@@ -51,7 +52,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		label_x = tas.deleteMin();
         		System.out.println("noeud actuel (label_x) : " + label_x.getNum());
         		label_x.setMarque(true);
+        		notifyNodeMarked(nodes.get(label_x.getNum()));
             	if (label_x == labels.get(data.getDestination().getId())) {
+            		notifyDestinationReached(nodes.get(label_x.getNum()));
             		System.out.println(data.getDestination().getId());
             		aLaFin = true;
             	} else {
@@ -69,6 +72,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     	        				if (oldCost_y != Float.MAX_VALUE) {
     	        					System.out.println("noeud a remove : " + label_y.getNum());
     	        					tas.remove(label_y);
+    	        				} else {
+    	        					notifyNodeReached(nodes.get(label_y.getNum()));
     	        				}
     	        				tas.insert(label_y);
     	        				label_y.setPere(arc);
