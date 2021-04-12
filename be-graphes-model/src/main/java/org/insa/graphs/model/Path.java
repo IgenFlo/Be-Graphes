@@ -84,6 +84,7 @@ public class Path {
         	return new Path(graph);
         } else {
         	for (int i=0 ; i<(nodes.size()-1) ; i++) {
+        		System.out.println("cSPFN : " + nodes.get(i).getSuccessors());
         		Arc arc_min = null;
         		float min_length = Float.MAX_VALUE;
         		for (Arc a : nodes.get(i).getSuccessors()) {

@@ -25,16 +25,19 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ArrayList<Label> labels = new ArrayList<Label>();
         BinaryHeap<Label> tas = new BinaryHeap<Label>();
         
-        //INITIALISATION
-        for (int i = 0 ; i < nodes.size()-1 ; i++) {
+        //INITIALISATION (creation d'un label pour chaque node)
+        for (int i = 0 ; i < nodes.size() ; i++) {
         	Label newLabel = new Label(nodes.get(i).getId());
         	newLabel.setMarque(false);
         	newLabel.setCost(Float.MAX_VALUE);
         	newLabel.setPere(null);
         	labels.add(newLabel);
+        	System.out.println("taille labels : " + labels.size()  + " et node actuel : " + nodes.get(i).getId());
         }
+        System.out.println("nbre nodes : " + nodes.size());
         
         labels.get(data.getOrigin().getId()).setCost(0);
+        labels.get(data.getOrigin().getId()).setMarque(true);
         tas.insert(labels.get(data.getOrigin().getId()));
         
         //DEROULEMENT
@@ -44,39 +47,71 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         boolean aLaFin = false;
         
         while (compteur < nodes.size() && !aLaFin) {
-        	label_x = tas.deleteMin();
-        	if (label_x == labels.get(data.getDestination().getId())) {
-        		aLaFin = true;
+        	if (!tas.isEmpty()){
+        		label_x = tas.deleteMin();
+        		System.out.println("noeud actuel (label_x) : " + label_x.getNum());
+        		label_x.setMarque(true);
+            	if (label_x == labels.get(data.getDestination().getId())) {
+            		System.out.println(data.getDestination().getId());
+            		aLaFin = true;
+            	} else {
+    	        	compteur++;
+    	        	for (Arc arc : nodes.get(label_x.getNum()).getSuccessors()) {
+    	        		if (!data.isAllowed(arc)) {
+                            continue;
+                        }
+    	        		label_y = labels.get(arc.getDestination().getId());
+    	        		if (!label_y.isMarked()) {
+    	        			float oldCost_y = label_y.getCost();
+    	        			label_y.setCost(Math.min(oldCost_y, label_x.getCost() + arc.getLength()));
+    	        			if ((oldCost_y - label_y.getCost()) != 0) {
+    	        				System.out.println("UPDATE de : " + label_y.getNum() + " d'ancien cout : " + oldCost_y + " et de nouveau cout : " + label_y.getCost());
+    	        				if (oldCost_y != Float.MAX_VALUE) {
+    	        					System.out.println("noeud a remove : " + label_y.getNum());
+    	        					tas.remove(label_y);
+    	        				}
+    	        				tas.insert(label_y);
+    	        				label_y.setPere(arc);
+    	        			}
+    	        		}
+    	        	}
+            	}
         	} else {
-	        	label_x.setMarque(true);
-	        	compteur++;
-	        	for (Arc arc : nodes.get(label_x.getNum()).getSuccessors()) {
-	        		label_y = labels.get(arc.getDestination().getId());
-	        		if (!label_y.isMarked()) {
-	        			float oldCost_y = label_y.getCost();
-	        			label_y.setCost(Math.min(label_y.getCost(), label_x.getCost() + arc.getLength()));
-	        			if (oldCost_y - label_y.getCost() != 0) {
-	        				tas.remove(label_y);
-	        				tas.insert(label_y);
-	        				label_y.setPere(arc);
-	        			}
-	        		}
-	        	}
+        		System.out.println("le tas est vide");
+        		compteur++;
         	}
+        	
         }
         
-        System.out.println("fin parcours");
+        System.out.println("fin parcours :");
+        System.out.println(tas);
+        System.out.println("le dernier : "+ label_x);
+        System.out.println("le node associé : " + label_x.getNum());
+        System.out.println("son pere : " + label_x.getPere());
         
         List<Arc> listArcsSolution = new ArrayList<Arc>();
-        Arc currentArc = label_y.getPere();
+        List<Node> listNodesSolution = new ArrayList<Node>();
+        Arc currentArc = label_x.getPere();
+        listNodesSolution.add(nodes.get(label_x.getNum()));
         while (currentArc != null) {
-	        listArcsSolution.add(label_y.getPere());
-	        currentArc = labels.get(label_y.getPere().getOrigin().getId()).getPere();
+	        //System.out.println("l'arc actuel : " + currentArc);
+	        //System.out.println("son origine : " + currentArc.getOrigin().getId());
+	        listArcsSolution.add(currentArc);
+	        listNodesSolution.add(0, currentArc.getOrigin());
+	        currentArc = labels.get(currentArc.getOrigin().getId()).getPere();
         }
         
-        Path newPath = new Path(graph, listArcsSolution);
+        System.out.println("solution récupérée : ");
+        System.out.println(listArcsSolution);
         
-        solution = new ShortestPathSolution(data, Status.OPTIMAL, newPath);
+        Path newPath = Path.createShortestPathFromNodes(graph, listNodesSolution);//new Path(graph, listArcsSolution);
+        
+        if (compteur >= nodes.size() && !aLaFin) {
+        	System.out.println("sorti du parcours dans arriver à destination");
+            solution = new ShortestPathSolution(data, Status.INFEASIBLE, newPath);
+        } else {
+            solution = new ShortestPathSolution(data, Status.OPTIMAL, newPath);
+        }
         
         return solution;
     }
