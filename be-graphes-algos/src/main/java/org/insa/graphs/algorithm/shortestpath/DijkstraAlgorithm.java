@@ -50,12 +50,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         while (compteur < nodes.size() && !aLaFin) {
         	if (!tas.isEmpty()){
         		label_x = tas.deleteMin();
-        		System.out.println("noeud actuel (label_x) : " + label_x.getNum());
+        		//System.out.println("noeud actuel (label_x) : " + label_x.getNum());
         		label_x.setMarque(true);
+        		System.out.println("cout du sommet marque : " + label_x.getCost());
         		notifyNodeMarked(nodes.get(label_x.getNum()));
             	if (label_x == labels.get(data.getDestination().getId())) {
             		notifyDestinationReached(nodes.get(label_x.getNum()));
-            		System.out.println(data.getDestination().getId());
+            		//System.out.println(data.getDestination().getId());
             		aLaFin = true;
             	} else {
     	        	compteur++;
@@ -68,9 +69,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     	        			float oldCost_y = label_y.getCost();
     	        			label_y.setCost(Math.min(oldCost_y, label_x.getCost() + arc.getLength()));
     	        			if ((oldCost_y - label_y.getCost()) != 0) {
-    	        				System.out.println("UPDATE de : " + label_y.getNum() + " d'ancien cout : " + oldCost_y + " et de nouveau cout : " + label_y.getCost());
+    	        				//System.out.println("UPDATE de : " + label_y.getNum() + " d'ancien cout : " + oldCost_y + " et de nouveau cout : " + label_y.getCost());
     	        				if (oldCost_y != Float.MAX_VALUE) {
-    	        					System.out.println("noeud a remove : " + label_y.getNum());
+    	        					//System.out.println("noeud a remove : " + label_y.getNum());
     	        					tas.remove(label_y);
     	        				} else {
     	        					notifyNodeReached(nodes.get(label_y.getNum()));
@@ -82,17 +83,17 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     	        	}
             	}
         	} else {
-        		System.out.println("le tas est vide");
+        		//System.out.println("le tas est vide");
         		compteur++;
         	}
         	
         }
         
-        System.out.println("fin parcours :");
-        System.out.println(tas);
-        System.out.println("le dernier : "+ label_x);
-        System.out.println("le node associé : " + label_x.getNum());
-        System.out.println("son pere : " + label_x.getPere());
+        //System.out.println("fin parcours :");
+        //System.out.println(tas);
+        //System.out.println("le dernier : "+ label_x);
+        //System.out.println("le node associé : " + label_x.getNum());
+        //System.out.println("son pere : " + label_x.getPere());
         
         List<Arc> listArcsSolution = new ArrayList<Arc>();
         List<Node> listNodesSolution = new ArrayList<Node>();
@@ -110,9 +111,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         System.out.println(listArcsSolution);
         
         Path newPath = Path.createShortestPathFromNodes(graph, listNodesSolution);//new Path(graph, listArcsSolution);
-        
+        System.out.println("chemin solution valide ? " + newPath.isValid());
+        System.out.print("taille du chemin  : " + newPath.getLength());
         if (compteur >= nodes.size() && !aLaFin) {
-        	System.out.println("sorti du parcours dans arriver à destination");
+        	//System.out.println("sorti du parcours sans arriver à destination");
             solution = new ShortestPathSolution(data, Status.INFEASIBLE, newPath);
         } else {
             solution = new ShortestPathSolution(data, Status.OPTIMAL, newPath);
