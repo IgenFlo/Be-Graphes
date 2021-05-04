@@ -8,11 +8,16 @@ import org.insa.graphs.model.Arc;
 import org.insa.graphs.model.Graph;
 import org.insa.graphs.model.Node;
 import org.insa.graphs.model.Path;
+import org.insa.graphs.model.Point;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
+    }
+    
+    public Label makeLabel(int nodeId, float estimCost) {
+    	return new Label(nodeId);
     }
 
     @Override
@@ -27,7 +32,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         
         //INITIALISATION (creation d'un label pour chaque node)
         for (int i = 0 ; i < nodes.size() ; i++) {
-        	Label newLabel = new Label(nodes.get(i).getId());
+        	//Label newLabel = new Label(nodes.get(i).getId());
+        	Label newLabel = makeLabel(nodes.get(i).getId(), (float)Point.distance(nodes.get(i).getPoint(), data.getDestination().getPoint()));
         	newLabel.setMarque(false);
         	newLabel.setCost(Float.MAX_VALUE);
         	newLabel.setPere(null);

@@ -16,7 +16,7 @@ public class Label implements Comparable<Label> {
 	
 	//---------- METHODES ----------//
 	public int compareTo(Label l) {
-		float diff = this.getCost() - l.getCost();
+		float diff = this.getTotalCost() - l.getTotalCost();
 		if (diff == 0) {
 			return 0;
 		} else if (diff < 0) {
@@ -32,9 +32,15 @@ public class Label implements Comparable<Label> {
 	public int getNum() {
 		return this.numeroSommet;
 	}
+	
 	public float getCost() {
 		return this.cout;
 	}
+	
+	public float getTotalCost() {
+		return this.cout;
+	}
+	
 	public Arc getPere() {
 		return this.pere;
 	}
