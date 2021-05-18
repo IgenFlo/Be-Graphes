@@ -25,6 +25,7 @@ public class Label implements Comparable<Label> {
 			return 1;
 		}
 	}
+	
 	public boolean isMarked() {
 		return this.marque;
 	}

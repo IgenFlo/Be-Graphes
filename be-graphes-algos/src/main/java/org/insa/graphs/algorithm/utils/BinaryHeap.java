@@ -122,6 +122,22 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
     public boolean isEmpty() {
         return this.currentSize == 0;
     }
+    
+    public boolean isValid() {
+    	BinaryHeap<E> tasAux = new BinaryHeap<E>(this);
+    	if (tasAux.isEmpty()) {
+    		return true;
+    	}
+    	E lastMin = tasAux.deleteMin();
+    	while (!tasAux.isEmpty()) {
+    		E newMin = tasAux.deleteMin();
+    		if (lastMin.compareTo(newMin) > 0) {
+    			return false;
+    		}
+    		lastMin = newMin;
+    	}
+    	return true;
+    }
 
     @Override
     public int size() {

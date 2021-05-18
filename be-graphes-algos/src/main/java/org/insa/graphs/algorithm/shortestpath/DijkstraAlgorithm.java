@@ -16,7 +16,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         super(data);
     }
     
-    public Label makeLabel(int nodeId, float estimCost) {
+    public Label makeLabel(int nodeId, float estimCost, ShortestPathData data) {
     	return new Label(nodeId);
     }
 
@@ -33,7 +33,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         //INITIALISATION (creation d'un label pour chaque node)
         for (int i = 0 ; i < nodes.size() ; i++) {
         	//Label newLabel = new Label(nodes.get(i).getId());
-        	Label newLabel = makeLabel(nodes.get(i).getId(), (float)Point.distance(nodes.get(i).getPoint(), data.getDestination().getPoint()));
+        	Label newLabel = makeLabel(nodes.get(i).getId(), (float)Point.distance(nodes.get(i).getPoint(), data.getDestination().getPoint()), data);
         	newLabel.setMarque(false);
         	newLabel.setCost(Float.MAX_VALUE);
         	newLabel.setPere(null);
@@ -58,7 +58,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		label_x = tas.deleteMin();
         		//System.out.println("noeud actuel (label_x) : " + label_x.getNum());
         		label_x.setMarque(true);
-        		System.out.println("cout du sommet marque : " + label_x.getCost());
+        		System.out.println("cout du sommet marque : " + label_x.getTotalCost());
         		notifyNodeMarked(nodes.get(label_x.getNum()));
             	if (label_x == labels.get(data.getDestination().getId())) {
             		notifyDestinationReached(nodes.get(label_x.getNum()));
@@ -73,7 +73,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     	        		label_y = labels.get(arc.getDestination().getId());
     	        		if (!label_y.isMarked()) {
     	        			float oldCost_y = label_y.getCost();
-    	        			label_y.setCost(Math.min(oldCost_y, label_x.getCost() + arc.getLength()));
+    	        			label_y.setCost(Math.min(oldCost_y, label_x.getCost() + (float)data.getCost(arc)));
     	        			if ((oldCost_y - label_y.getCost()) != 0) {
     	        				//System.out.println("UPDATE de : " + label_y.getNum() + " d'ancien cout : " + oldCost_y + " et de nouveau cout : " + label_y.getCost());
     	        				if (oldCost_y != Float.MAX_VALUE) {
@@ -92,7 +92,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		//System.out.println("le tas est vide");
         		compteur++;
         	}
-        	
+        	System.out.println("Tas valide ? " + tas.isValid());
         }
         
         //System.out.println("fin parcours :");
@@ -113,18 +113,20 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	        currentArc = labels.get(currentArc.getOrigin().getId()).getPere();
         }
         
-        System.out.println("solution récupérée : ");
-        System.out.println(listArcsSolution);
+        //System.out.println("solution récupérée : ");
+        //System.out.println(listArcsSolution);
         
         Path newPath = Path.createShortestPathFromNodes(graph, listNodesSolution);//new Path(graph, listArcsSolution);
-        System.out.println("chemin solution valide ? " + newPath.isValid());
-        System.out.print("taille du chemin  : " + newPath.getLength());
+        //System.out.println("chemin solution valide ? " + newPath.isValid());
+        //System.out.print("taille du chemin  : " + newPath.getLength());
         if (compteur >= nodes.size() && !aLaFin) {
         	//System.out.println("sorti du parcours sans arriver à destination");
             solution = new ShortestPathSolution(data, Status.INFEASIBLE, newPath);
         } else {
             solution = new ShortestPathSolution(data, Status.OPTIMAL, newPath);
         }
+        
+        System.out.println("feasible ? " + solution.isFeasible());
         
         return solution;
     }
