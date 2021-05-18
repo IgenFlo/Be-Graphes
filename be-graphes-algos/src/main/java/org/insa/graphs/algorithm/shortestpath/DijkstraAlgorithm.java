@@ -2,6 +2,7 @@ package org.insa.graphs.algorithm.shortestpath;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.insa.graphs.algorithm.AbstractInputData.Mode;
 import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.algorithm.utils.BinaryHeap;
 import org.insa.graphs.model.Arc;
@@ -16,7 +17,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         super(data);
     }
     
-    public Label makeLabel(int nodeId, float estimCost, ShortestPathData data) {
+    public Label makeLabel(int nodeId, float estimCost) {
     	return new Label(nodeId);
     }
 
@@ -32,15 +33,19 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         
         //INITIALISATION (creation d'un label pour chaque node)
         for (int i = 0 ; i < nodes.size() ; i++) {
-        	//Label newLabel = new Label(nodes.get(i).getId());
-        	Label newLabel = makeLabel(nodes.get(i).getId(), (float)Point.distance(nodes.get(i).getPoint(), data.getDestination().getPoint()), data);
+        	Label newLabel = null;
+        	if (data.getMode() == Mode.LENGTH) {
+            	newLabel = makeLabel(nodes.get(i).getId(), (float)Point.distance(nodes.get(i).getPoint(), data.getDestination().getPoint()));
+        	} else {
+            	newLabel = makeLabel(nodes.get(i).getId(), (float)Point.distance(nodes.get(i).getPoint(), data.getDestination().getPoint())/data.getGraph().getGraphInformation().getMaximumSpeed());
+        	}
         	newLabel.setMarque(false);
         	newLabel.setCost(Float.MAX_VALUE);
         	newLabel.setPere(null);
         	labels.add(newLabel);
-        	System.out.println("taille labels : " + labels.size()  + " et node actuel : " + nodes.get(i).getId());
+        	//System.out.println("taille labels : " + labels.size()  + " et node actuel : " + nodes.get(i).getId());
         }
-        System.out.println("nbre nodes : " + nodes.size());
+        //System.out.println("nbre nodes : " + nodes.size());
         
         labels.get(data.getOrigin().getId()).setCost(0);
         labels.get(data.getOrigin().getId()).setMarque(true);
@@ -58,7 +63,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		label_x = tas.deleteMin();
         		//System.out.println("noeud actuel (label_x) : " + label_x.getNum());
         		label_x.setMarque(true);
-        		System.out.println("cout du sommet marque : " + label_x.getTotalCost());
+        		//System.out.println("cout du sommet marque : " + label_x.getTotalCost());
         		notifyNodeMarked(nodes.get(label_x.getNum()));
             	if (label_x == labels.get(data.getDestination().getId())) {
             		notifyDestinationReached(nodes.get(label_x.getNum()));
@@ -92,7 +97,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		//System.out.println("le tas est vide");
         		compteur++;
         	}
-        	System.out.println("Tas valide ? " + tas.isValid());
+        	//System.out.println("Tas valide ? " + tas.isValid());
         }
         
         //System.out.println("fin parcours :");
@@ -126,7 +131,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             solution = new ShortestPathSolution(data, Status.OPTIMAL, newPath);
         }
         
-        System.out.println("feasible ? " + solution.isFeasible());
+        //System.out.println("feasible ? " + solution.isFeasible());
         
         return solution;
     }

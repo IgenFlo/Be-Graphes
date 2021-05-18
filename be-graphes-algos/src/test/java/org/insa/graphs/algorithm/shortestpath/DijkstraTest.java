@@ -7,6 +7,7 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Random;
 
 import org.insa.graphs.algorithm.ArcInspector;
 import org.insa.graphs.algorithm.ArcInspectorFactory;
@@ -55,24 +56,48 @@ public class DijkstraTest {
 	
 	@Test
 	public void run() {
-		//INIT ALGOS
-		int num_origin = 650;
-		int num_dest = 241;
-		Node node_origin = DijkstraTest.graph.getNodes().get(num_origin);
-		Node node_dest = DijkstraTest.graph.getNodes().get(num_dest);
-		ArcInspector filter = ArcInspectorFactory.getAllFilters().get(1);
+		int num_origin = 0;
+		int num_dest = 0;
+		int nb_nodes = DijkstraTest.graph.getNodes().size();
+		for (int i = 0 ; i < 20 ; i++) {
+			System.out.println("--------------------Test "+(i+1)+"--------------------");
+			//origine et destination aleaotires
+			num_origin = new Random().nextInt(nb_nodes);
+			num_dest = new Random().nextInt(nb_nodes);
+			System.out.println("origine : "+num_origin+" destination : "+num_dest);
+			//Recuperation des noeuds et choix du filtre
+			Node node_origin = DijkstraTest.graph.getNodes().get(num_origin);
+			Node node_dest = DijkstraTest.graph.getNodes().get(num_dest);
+			for (int j = 0 ; j < 5 ; j++) {
+				ArcInspector filter = ArcInspectorFactory.getAllFilters().get(j);
+				//Parcours et renvoi de la solution
+				this.algoDijkstra = new DijkstraAlgorithm(
+						new ShortestPathData(DijkstraTest.graph, node_origin, node_dest, filter));
+				this.algoBellmanFord = new BellmanFordAlgorithm(
+						new ShortestPathData(DijkstraTest.graph, node_origin, node_dest, filter));
+				ShortestPathSolution solutionDijkstra = this.algoDijkstra.doRun();
+				ShortestPathSolution solutionBellmanFord = this.algoBellmanFord.doRun();
+				//Tests
+				if (solutionDijkstra.isFeasible()) {
+					//En temps
+					System.out.print("Test en temps, filtre "+j+" "+filter+ " : ");
+					System.out.println(solutionDijkstra.getPath().getMinimumTravelTime()-solutionBellmanFord.getPath().getMinimumTravelTime());
+					assertTrue(solutionDijkstra.getPath().getMinimumTravelTime()-solutionBellmanFord.getPath().getMinimumTravelTime() <= 0.001f);
+					//En distance
+					System.out.print("Test en distance, filtre "+j+" "+filter+" : ");
+					System.out.println(solutionDijkstra.getPath().getLength()-solutionBellmanFord.getPath().getLength());
+					assertTrue(solutionDijkstra.getPath().getLength()-solutionBellmanFord.getPath().getLength() <= 0.001f);
+				} else {
+					System.out.print("Test chemin pas faisables : "+filter+" : ");
+					System.out.println(!solutionBellmanFord.isFeasible());
+					assertEquals(solutionDijkstra.isFeasible(), solutionBellmanFord.isFeasible());
+				}
+				
+			}
+			
+			
+		}
 		
-		this.algoDijkstra = new DijkstraAlgorithm(
-				new ShortestPathData(DijkstraTest.graph, node_origin, node_dest, filter));
-		
-		this.algoBellmanFord = new BellmanFordAlgorithm(
-				new ShortestPathData(DijkstraTest.graph, node_origin, node_dest, filter));
-		
-		ShortestPathSolution solutionDijkstra = this.algoDijkstra.doRun();
-		ShortestPathSolution solutionBellmanFord = this.algoBellmanFord.doRun();
-		
-		//ASSERTIONS
-		assertEquals(solutionDijkstra.getSolvingTime(), solutionBellmanFord.getSolvingTime());
 	}
 }
 
